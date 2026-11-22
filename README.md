@@ -18,6 +18,16 @@ python "$bridge/workflow.py" slab.fieldcraft "$bridge/samples/potential.py" firs
 
 The one-volt slab is 1 m long with a 0.01 m² cross-section. Its field is 1 V/m in the positive x direction. The stored energy is 4.4270939064e-14 J. The run writes the potential, electric field and energy. Open the same model in a FieldCraft build with external contours, then run `results.external.contour` with the absolute path to `first-run/field-1.json`. A vector supports magnitude and individual Cartesian components. Use `python show_run.py --help` to select fields in a running FieldCraft GUI over its local control port.
 
+## Run a saved case
+
+Keep the model, the editable Python physics script and a case JSON together. Paths in the case file are relative to that file. To run the included example, copy all three sample files to a new project directory and create the model with `fieldcraft-cli run slab.json` there. Start the complete solve with:
+
+```sh
+fieldcraft-ngsolve case slab.case.json run-01
+```
+
+Add `--gui /path/to/fieldcraft` to start a new FieldCraft window showing the configured field and the run's integrals. On macOS the executable is inside the app at `Contents/MacOS/FieldCraft`. Use `--port PORT` for a window already displaying the same mesh. Each result stays in its own run directory if GUI display fails. A case is executed only when chosen by the user. Review the referenced Python script before running a case received from someone else.
+
 ## A user-defined formulation
 
 The runner invokes the selected interpreter with two arguments following the script name, the exchange mesh path and the output directory. Supply `--python /path/to/python` to choose another interpreter. The mesh exports complete disjoint material and exterior boundary sets. Pass `--dimension 2` for planar meshes. On tetrahedra, `--interfaces` accepts optional named internal faces, with one selected owning side for each facet.

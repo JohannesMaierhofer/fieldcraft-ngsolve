@@ -1,0 +1,9 @@
+{
+  "format": "fieldcraft-ngsolve-case/1",
+  "model": "slab.fieldcraft",
+  "script": "potential.py",
+  "materials": ["dielectric"],
+  "boundaries": ["left", "right", "wall"],
+  "field": "electric_field",
+  "component": "x"
+}

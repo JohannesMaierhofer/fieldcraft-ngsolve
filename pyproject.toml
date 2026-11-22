@@ -14,4 +14,4 @@ dependencies = ["numpy>=1.26"]
 fieldcraft-ngsolve = "workflow:main"
 
 [tool.setuptools]
-py-modules = ["workflow", "fc_results", "interior", "mesh_exchange", "planar_exchange", "result_exchange", "show_run"]
+py-modules = ["case_run", "workflow", "fc_results", "interior", "mesh_exchange", "planar_exchange", "result_exchange", "show_run"]

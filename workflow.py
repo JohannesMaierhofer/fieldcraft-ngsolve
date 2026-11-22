@@ -155,7 +155,11 @@ def run(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+    if sys.argv[1:2] == ["case"]:
+        from case_run import main as run_case
+        run_case(sys.argv[2:])
+        return
+    parser = argparse.ArgumentParser(description=__doc__, epilog="Use the case subcommand for a saved project and optional GUI display.")
     parser.add_argument("model",type=Path)
     parser.add_argument("script",type=Path)
     parser.add_argument("out",type=Path)
