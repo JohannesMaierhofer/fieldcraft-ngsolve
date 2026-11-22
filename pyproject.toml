@@ -15,4 +15,4 @@ fieldcraft-ngsolve = "workflow:main"
 fieldcraft-ngsolve-transfer = "transfer_load:main"
 
 [tool.setuptools]
-py-modules = ["case_run", "workflow", "fc_results", "interior", "mesh_exchange", "planar_exchange", "result_exchange", "show_run", "transfer_load"]
+py-modules = ["case_run", "workflow", "fc_results", "interior", "mesh_exchange", "planar_exchange", "result_exchange", "show_run", "time_series", "transfer_load"]

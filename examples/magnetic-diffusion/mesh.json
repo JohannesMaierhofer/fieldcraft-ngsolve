@@ -1,0 +1,123 @@
+[
+  {
+    "command": "model.units",
+    "params": {
+      "system": "m-kg-s-N-Pa"
+    }
+  },
+  {
+    "command": "mesh.block",
+    "params": {
+      "body": "slab",
+      "kind": "tet4",
+      "corners": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.01,
+          0.0,
+          0.0
+        ],
+        [
+          0.01,
+          0.002,
+          0.0
+        ],
+        [
+          0.0,
+          0.002,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.002
+        ],
+        [
+          0.01,
+          0.0,
+          0.002
+        ],
+        [
+          0.01,
+          0.002,
+          0.002
+        ],
+        [
+          0.0,
+          0.002,
+          0.002
+        ]
+      ],
+      "divisions": [
+        24,
+        2,
+        2
+      ],
+      "faces": {
+        "1": "wall",
+        "2": "wall",
+        "3": "wall",
+        "4": "right",
+        "5": "wall",
+        "6": "left"
+      }
+    }
+  },
+  {
+    "command": "model.set.create",
+    "params": {
+      "name": "conductor",
+      "geometry": [
+        {
+          "body": "slab"
+        }
+      ]
+    }
+  },
+  {
+    "command": "model.set.create",
+    "params": {
+      "name": "left",
+      "geometry": [
+        {
+          "body": "slab",
+          "face": "left"
+        }
+      ]
+    }
+  },
+  {
+    "command": "model.set.create",
+    "params": {
+      "name": "right",
+      "geometry": [
+        {
+          "body": "slab",
+          "face": "right"
+        }
+      ]
+    }
+  },
+  {
+    "command": "model.set.create",
+    "params": {
+      "name": "wall",
+      "geometry": [
+        {
+          "body": "slab",
+          "face": "wall"
+        }
+      ]
+    }
+  },
+  {
+    "command": "file.save",
+    "params": {
+      "path": "diffusion.fieldcraft"
+    }
+  }
+]

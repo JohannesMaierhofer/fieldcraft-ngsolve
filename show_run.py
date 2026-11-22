@@ -120,10 +120,19 @@ def open_model(call, model):
     raise ControlError('Das Fenster hat das Öffnen des Modells nicht innerhalb von 120 Sekunden bestätigt.')
 
 
-def apply(call, manifest, run, field, component, integrals, model):
+def apply(call, manifest, run, field, component, integrals, model, series=None):
     actions = []
     if field:
         actions.append(('results.external.contour', select_field(manifest, run, field, component)))
+    if series:
+        from time_series import description
+        matches = [entry for entry in run.get('series', []) if entry['name'] == series]
+        if len(matches) != 1 or field:
+            raise ValueError('Select one field or a uniquely named time series.')
+        path, item = description(manifest.parent, matches[0], run['mesh_sha256'])
+        if component and item['components'] != 3:
+            raise ValueError('A component requires a vector series.')
+        actions.append(('results.external.series', {'path':str(path), **({'component': component} if component else {})}))
     if integrals:
         actions.append(('results.external.integrals', {'path': str(manifest)}))
     if not actions:
@@ -153,29 +162,32 @@ def main(argv=None):
     parser.add_argument('run', type=Path, help='Laufordner oder results.json')
     parser.add_argument('--list', action='store_true', help='Felder und Integralnamen lokal auflisten')
     parser.add_argument('--port', type=int, help='Bewusst ausgewählter Port des laufenden FieldCraft-Fensters')
-    parser.add_argument('--field', help='Exakter Feldname aus --list')
+    display = parser.add_mutually_exclusive_group()
+    display.add_argument('--series', help='Show a named time series on its original mesh')
+    display.add_argument('--field', help='Exakter Feldname aus --list')
     parser.add_argument('--component', choices=('x','y','z','magnitude'), help='Vektorkomponente, Standard ist der Betrag')
     parser.add_argument('--integrals', action='store_true', help='Integrale im aktuellen Modell prüfen und anzeigen')
     parser.add_argument('--open-model', action='store_true', help='Bei Bedarf das Modell aus dem Manifest über die normale Öffnen-Funktion laden')
     parser.add_argument('--model', type=Path, help='Mit --open-model einen verschobenen Modellpfad angeben')
     args = parser.parse_args(argv)
     manifest, run = read_run(args.run)
-    if args.component and not args.field:
-        parser.error('--component benötigt --field.')
+    if args.component and not (args.field or args.series):
+        parser.error('--component benötigt --field oder --series.')
     if args.model and not args.open_model:
         parser.error('--model benötigt --open-model.')
-    if args.list or (not args.field and not args.integrals):
+    if args.list or (not args.field and not args.integrals and not args.series):
         print(json.dumps({'fields': [{k:f[k] for k in ('name','unit')} for f in run['fields']],
+                          'series': [{k:s[k] for k in ('name','unit')} for s in run.get('series',[])],
                           'integrals': [{k:q[k] for k in ('name','unit')} for q in run['integrals']]},
                          ensure_ascii=False, indent=2))
-    if not args.field and not args.integrals:
+    if not args.field and not args.integrals and not args.series:
         if args.open_model:
             parser.error('--open-model benötigt --field oder --integrals.')
         return
     if args.port is None:
         parser.error('Für die Anzeige im Fenster --port angeben.')
     model = (args.model or Path(run['model'])).resolve(strict=True) if args.open_model else None
-    replies = apply(Control(args.port), manifest, run, args.field, args.component, args.integrals, model)
+    replies = apply(Control(args.port), manifest, run, args.field, args.component, args.integrals, model, series=args.series)
     for reply in replies:
         print(json.dumps(reply, ensure_ascii=False, indent=2))
 

@@ -43,3 +43,13 @@ In the script, `mesh, data = load_mesh(mesh_path)` constructs the solver mesh fr
 `results.json` records the mesh fingerprint, model and script hashes, runtime versions, names, units and quantities. `fields.vtu` retains the original element connectivity and node IDs. Before writing per-field view files, the runner checks node labels, coordinates, cell topology, component counts and finite values. The optional `results.external.integrals` command reads the integral list in builds that include it.
 
 Run the bridge's regression tests using `python -m unittest discover`. [FieldCraft issue 963](https://github.com/tangency-labs/fieldcraft/issues/963)
+
+## Time-dependent fields
+
+Pass the optional `series` argument to `fc_results.write_results`. Each series has a single unit and an iterable of pairs containing physical time in seconds and the scalar N or vector N×3 values on the exported vertices, in mesh order.
+
+```python
+write_results(output, data, fields, integrals, series={"B": ("T", snapshots)})
+```
+
+The new run's optional `series` list names a `fieldcraft-nodal-series/1` JSON file. Each entry of its `frames` array gives a strictly increasing finite `time` and a sibling `file`. Each of the 2–4096 files is an ordinary `fieldcraft-nodal-field/1` bound to the same native mesh digest, labels, field name, unit and component count. The workflow checks the files before publishing the run. A case can select a default `series` and vector `component`. The generated `view-series-N.json` recipe and `show_run.py --series NAME` use the native `results.external.series` command. [Transient magnetic diffusion example](examples/magnetic-diffusion/README.md)

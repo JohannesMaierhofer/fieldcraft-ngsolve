@@ -57,7 +57,7 @@ def load_mesh(path):
     return mesh, data
 
 
-def write_results(output, data, fields, integrals):
+def write_results(output, data, fields, integrals, *, series=None):
     """Write original topology and labelled real fields. Scalars and vectors carry SI units."""
     out = Path(output)
     out.mkdir(parents=True, exist_ok=True)
@@ -93,4 +93,7 @@ def write_results(output, data, fields, integrals):
     add(cell_data, "types", "UInt8", np.full(len(cells), 10 if is_volume else 5))
     ET.ElementTree(root).write(out/"fields.vtu", encoding="utf-8", xml_declaration=True)
     manifest = {"fields": catalog, "integrals": integrals, "mesh_sha256": str(data["mesh_sha256"].item())}
+    if series:
+        from time_series import write
+        manifest["series"] = write(out, data, series)
     (out/"results.json").write_text(json.dumps(manifest, allow_nan=False, indent=2)+"\n")

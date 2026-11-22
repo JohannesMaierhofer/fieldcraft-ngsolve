@@ -103,6 +103,7 @@ def run(args):
             append_interfaces(model, mesh_path, args.interfaces)
         with np.load(mesh_path, allow_pickle=False) as arrays:
             mesh_hash = str(arrays["mesh_sha256"].item())
+            node_ids = arrays["node_ids"].tolist()
         script_hash = digest(script)
         model_hash = digest(model)
         exchange_hash = digest(mesh_path)
@@ -117,8 +118,9 @@ def run(args):
         fields, integrals = manifest["fields"], manifest["integrals"]
         if manifest.get("mesh_sha256") != mesh_hash:
             raise ValueError("Missing or incorrect output mesh fingerprint")
-        if not isinstance(fields,list) or not isinstance(integrals,list) or not (fields or integrals):
-            raise ValueError("Expected a field or integral")
+        series = manifest.get("series", [])
+        if not all(isinstance(items,list) for items in (fields,integrals,series)) or not (fields or integrals or series):
+            raise ValueError("Expected a field, integral or time series")
         names(fields)
         names(integrals)
         for entry in integrals:
@@ -138,6 +140,14 @@ def run(args):
             dump(stage/f"view-{i+1}.json",[
                 {"command":"file.open","params":{"path":str(model)}},
                 {"command":"results.external.contour","params":{"path":str(dest/file)}}])
+        if series:
+            from time_series import validate
+            names(series)
+            for index, item in enumerate(series, start=1):
+                validate(stage, item, mesh_hash, node_ids)
+                dump(stage/f"view-series-{index}.json", [
+                    {"command":"file.open", "params":{"path":str(model)}},
+                    {"command":"results.external.series", "params":{"path":str(dest/item["file"])}}])
         versions = subprocess.check_output([interpreter,"-c",
             "import json,sys,ngsolve,netgen,numpy; print(json.dumps([sys.version,ngsolve.__version__,netgen.__version__,numpy.__version__]))"],
             text=True, env=env, timeout=60)

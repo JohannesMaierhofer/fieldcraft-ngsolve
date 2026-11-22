@@ -14,7 +14,7 @@ def load_case(source):
     if len(raw) > 65536:
         raise ValueError('Case definition exceeds 64 KiB')
     case = json.loads(raw)
-    allowed = {'format','model','script','dimension','materials','boundaries','interfaces','field','component'}
+    allowed = {'format','model','script','dimension','materials','boundaries','interfaces','field','series','component'}
     if not isinstance(case,dict) or case.get('format') != 'fieldcraft-ngsolve-case/1' or set(case)-allowed:
         raise ValueError('Expected a fieldcraft-ngsolve-case/1 file with known keys')
     for key in ('model','script'):
@@ -27,13 +27,15 @@ def load_case(source):
                 or not all(isinstance(v,str) and v.strip() for v in values) or len(set(values))!=len(values)):
             raise ValueError(f'Invalid case {key}')
         case[key]=values
+    if any(k in case and (not isinstance(case[k],str) or not case[k].strip()) for k in ('field','series')) or ('field' in case and 'series' in case):
+        raise ValueError('A case may select one field or one time series')
     if (case.get('dimension',3) not in (2,3) or
             case.get('component') not in (None,'x','y','z','magnitude')):
         raise ValueError('Invalid dimension or view component')
     return case
 
 
-def display_new(executable,manifest,result,field,component,model):
+def display_new(executable,manifest,result,field,component,model,series=None):
     from show_run import Control, apply
     # Choose a loopback port for a dedicated window. The application binds it
     # after startup, so also check that the child remains alive before use.
@@ -53,7 +55,7 @@ def display_new(executable,manifest,result,field,component,model):
             time.sleep(.2)
     else:
         raise TimeoutError('FieldCraft did not open its control channel within 90 s')
-    apply(control,manifest,result,field,component,bool(result['integrals']),model)
+    apply(control,manifest,result,field,component,bool(result['integrals']),model,series=series)
     print(f'FieldCraft control port {port}')
 
 
@@ -65,7 +67,9 @@ def main(argv):
     parser.add_argument('out',type=Path,help='A new output directory')
     parser.add_argument('--python',default=sys.executable)
     parser.add_argument('--timeout',type=int,default=3600)
-    parser.add_argument('--field',help='Result to display (defaults to the case field or first result)')
+    view=parser.add_mutually_exclusive_group()
+    view.add_argument('--series',help='Time series to display')
+    view.add_argument('--field',help='Result to display (defaults to the case field or first result)')
     group=parser.add_mutually_exclusive_group()
     group.add_argument('--gui',type=Path,help='Open results in a new window of this FieldCraft executable')
     group.add_argument('--port',type=int,help='Show results on the current mesh of this FieldCraft control port')
@@ -84,9 +88,13 @@ def main(argv):
     if args.gui or args.port:
         manifest,result=read_run(args.out)
         first=result['fields'][0]['name'] if result['fields'] else None
-        field=args.field or case.get('field') or first
-        component=case.get('component') if field==case.get('field') else None
+        series = args.series or (case.get('series') if not args.field else None)
+        field = None if series else args.field or case.get('field') or first
+        if not series and not field and result.get('series'):
+            series = result['series'][0]['name']
+        component = case.get('component') if ((field and field == case.get('field')) or
+                                              (series and series == case.get('series'))) else None
         if args.gui:
-            display_new(args.gui.resolve(),manifest,result,field,component,case['model'])
+            display_new(args.gui.resolve(),manifest,result,field,component,case['model'],series=series)
         else:
-            apply(Control(args.port),manifest,result,field,component,bool(result['integrals']),None)
+            apply(Control(args.port),manifest,result,field,component,bool(result['integrals']),None,series=series)

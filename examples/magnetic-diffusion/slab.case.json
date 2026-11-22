@@ -1,0 +1,15 @@
+{
+  "format": "fieldcraft-ngsolve-case/1",
+  "model": "diffusion.fieldcraft",
+  "script": "solve.py",
+  "materials": [
+    "conductor"
+  ],
+  "boundaries": [
+    "left",
+    "right",
+    "wall"
+  ],
+  "series": "B",
+  "component": "y"
+}
