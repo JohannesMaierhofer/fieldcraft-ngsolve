@@ -39,14 +39,17 @@ def load_mesh(path):
     incident = np.array([owners[tuple(sorted(t))] for t in tris.tolist()])
     if None in incident:
         raise ValueError("Exterior triangle without incident volume")
+    region_number = 0
     for tag, name in enumerate(data["boundary_names"], 1):
         selected = data["boundary_ids"] == tag
         for region in np.unique(incident[selected]):
-            desc = native.Add(nm.FaceDescriptor(surfnr=tag, domin=int(region), domout=0, bc=tag))
+            region_number += 1
+            desc = native.Add(nm.FaceDescriptor(surfnr=region_number, domin=int(region), domout=0, bc=region_number))
+            native.SetBCName(desc-1, str(name))
             native.AddElements(2, desc, np.ascontiguousarray(tris[selected & (incident == region)], dtype=np.int32), base=0)
-        native.SetBCName(tag-1, str(name))
+
     from interior import attach
-    attach(native, data)
+    attach(native, data, region_number)
     native.UpdateTopology()
     mesh = ng.Mesh(native)
     if mesh.ne != len(cells) or mesh.nv != len(points):

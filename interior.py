@@ -48,16 +48,17 @@ def append_interfaces(model_path, mesh_path, requested):
     np.savez_compressed(mesh_path,**arrays)
 
 
-def attach(native, data):
+def attach(native, data, region_number):
     from netgen.meshing import FaceDescriptor
     region=data["material_ids"]
-    offset=len(data["boundary_names"])
     for i,name in enumerate(data.get("interface_names",[]),1):
         selected=data["interface_ids"]==i
         adjacent=np.column_stack([region[data["interface_owner"][selected]], region[data["interface_neighbor"][selected]]])
         for inside,outside in np.unique(adjacent,axis=0):
             pair=np.all(adjacent==[inside,outside],axis=1)
-            desc=native.Add(FaceDescriptor(surfnr=offset+i,domin=int(inside),domout=int(outside),bc=offset+i))
+            region_number += 1
+            desc=native.Add(FaceDescriptor(surfnr=region_number,domin=int(inside),domout=int(outside),bc=region_number))
+            native.SetBCName(desc-1,str(name))
             tri=data["interface_triangles"][selected][pair]
             native.AddElements(2,desc,np.ascontiguousarray(tri,dtype=np.int32),base=0)
-        native.SetBCName(offset+i-1,str(name))
+
