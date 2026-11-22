@@ -18,6 +18,8 @@ python "$bridge/workflow.py" slab.fieldcraft "$bridge/samples/potential.py" firs
 
 The one-volt slab is 1 m long with a 0.01 m² cross-section. Its field is 1 V/m in the positive x direction. The stored energy is 4.4270939064e-14 J. The run writes the potential, electric field and energy. Open the same model in a FieldCraft build with external contours, then run `results.external.contour` with the absolute path to `first-run/field-1.json`. A vector supports magnitude and individual Cartesian components. Use `python show_run.py --help` to select fields in a running FieldCraft GUI over its local control port.
 
+The [3D magnet and armature example](examples/armature/) computes forces and moments on a closed surface in air. It includes a mesh study, an analytic quadrature check and a three-gap sweep.
+
 ## Run a saved case
 
 Keep the model, the editable Python physics script and a case JSON together. Paths in the case file are relative to that file. To run the included example, copy all three sample files to a new project directory and create the model with `fieldcraft-cli run slab.json` there. Start the complete solve with:

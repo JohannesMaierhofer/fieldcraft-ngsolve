@@ -1,0 +1,9 @@
+{
+  "format": "fieldcraft-ngsolve-case/1",
+  "model": "armature.fieldcraft",
+  "script": "magnet.py",
+  "materials": ["magnet", "steel", "air"],
+  "boundaries": ["outer"],
+  "interfaces": ["armature_air_envelope"],
+  "field": "B_nodal_average"
+}
