@@ -20,6 +20,10 @@ The one-volt slab is 1 m long with a 0.01 m² cross-section. Its field is 1 V/m 
 
 The [3D magnet and armature example](examples/armature/) computes forces and moments on a closed surface in air. It includes a mesh study, an analytic quadrature check and a three-gap sweep.
 
+## Apply magnetic loads to a structural model
+
+Use `fieldcraft-ngsolve-transfer` to apply signed force and moment integrals to a named attachment region and native structural step. Supply the source moment origin and the new attachment point in global metres. The command writes a new FieldCraft model and can solve the selected step with its existing loads. [Load transfer and equilibrium check](structural-load-transfer.md)
+
 ## Run a saved case
 
 Keep the model, the editable Python physics script and a case JSON together. Paths in the case file are relative to that file. To run the included example, copy all three sample files to a new project directory and create the model with `fieldcraft-cli run slab.json` there. Start the complete solve with:
