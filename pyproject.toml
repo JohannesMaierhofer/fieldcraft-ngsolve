@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fieldcraft-ngsolve"
+version = "0.1.0"
+description = "File-based coupling of a named FieldCraft mesh to a user-selected NGSolve script"
+requires-python = ">=3.11"
+license = "MIT OR Apache-2.0"
+dependencies = ["numpy>=1.26"]
+
+[project.scripts]
+fieldcraft-ngsolve = "workflow:main"
+
+[tool.setuptools]
+py-modules = ["workflow", "fc_results", "interior", "mesh_exchange", "planar_exchange", "result_exchange", "show_run"]
