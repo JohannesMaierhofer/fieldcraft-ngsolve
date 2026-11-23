@@ -1,0 +1,391 @@
+{
+  "method": "rigid armature virtual work at fixed magnet remanence",
+  "frame": "global Cartesian XYZ",
+  "center_m": [
+    0.003,
+    0,
+    0
+  ],
+  "side_point_m": [
+    0.003,
+    0.002,
+    0
+  ],
+  "runtime": {
+    "python": "3.13.18 (main, Nov 11 2026, 00:10:51) [Clang 23.1.3 ]",
+    "ngsolve": "6.2.2608",
+    "netgen": "6.2.2608",
+    "numpy": "2.3.5"
+  },
+  "rows": [
+    {
+      "gap_mm": 4.0,
+      "level": 1,
+      "tetrahedra": 4608,
+      "dofs": 7225,
+      "mesh_sha256": "16ea94f4310de000ff6d9e2a3891f1f0bc0c6b83b295d6894bd51d636ec169af",
+      "model_sha256": "522a24d8048cf517bc50ab0113e4d3d57b1a47595b610e0889cb7bafc4606d31",
+      "solver_script_sha256": "f8f6c2bc3a1ada5c7acfb5dd7f42ba886c34004e72b2b87d7558d0c00930656b",
+      "virtual_work_sha256": "5b7e6022f35cf5b55b39559e2230c8b728329892f35ac84649aab5408a988d1e",
+      "force_N": [
+        -0.003146630288604532,
+        7.70636254321947e-05,
+        7.706362543219645e-05
+      ],
+      "moment_center_Nm": [
+        6.981404369947554e-22,
+        9.85055250502318e-08,
+        -9.850552505023318e-08
+      ],
+      "moment_side_Nm": [
+        -1.5412725086439185e-07,
+        9.85055250502318e-08,
+        -6.391766102259304e-06
+      ],
+      "stationary_scalar_coenergy_J": -0.0020677835487075283,
+      "relative_free_dof_residual": 1.0062899752650582e-12
+    },
+    {
+      "gap_mm": 4.0,
+      "level": 2,
+      "tetrahedra": 36864,
+      "dofs": 53361,
+      "mesh_sha256": "0d9c8db85675a17264dc7243b01d36d678c8e05e97bf98eaeb2dbe35dda529c9",
+      "model_sha256": "404ef16f05614162e6d5fb9fc2cd07a35e0176cc468f9c64fe655c9657d6afd6",
+      "solver_script_sha256": "f8f6c2bc3a1ada5c7acfb5dd7f42ba886c34004e72b2b87d7558d0c00930656b",
+      "virtual_work_sha256": "5b7e6022f35cf5b55b39559e2230c8b728329892f35ac84649aab5408a988d1e",
+      "force_N": [
+        -0.0031285860201038375,
+        7.015837365537185e-06,
+        7.015837365531748e-06
+      ],
+      "moment_center_Nm": [
+        -1.4663844309033798e-21,
+        8.27637600925505e-09,
+        -8.276376009270817e-09
+      ],
+      "moment_side_Nm": [
+        -1.40316747310807e-08,
+        8.27637600925505e-09,
+        -6.265448416216938e-06
+      ],
+      "stationary_scalar_coenergy_J": -0.002165164632757724,
+      "relative_free_dof_residual": 9.087822581497518e-13,
+      "change_from_level": 1,
+      "relative_change_axial_force": 0.005767547507003017,
+      "relative_change_force_vector": 0.03218450745136918,
+      "relative_change_side_moment_vector": 0.03337393735083991,
+      "absolute_change_center_moment_Nm": 1.276032862951225e-07
+    },
+    {
+      "gap_mm": 4.0,
+      "level": 3,
+      "tetrahedra": 124416,
+      "dofs": 175273,
+      "mesh_sha256": "45475b678edfa328e024beb743f09f93970446139999a008d10fb95d15175783",
+      "model_sha256": "dc03be5bcab28de9e102f8bba507b4bdf75fb658640f3f75fa28043b261c8114",
+      "solver_script_sha256": "f8f6c2bc3a1ada5c7acfb5dd7f42ba886c34004e72b2b87d7558d0c00930656b",
+      "virtual_work_sha256": "5b7e6022f35cf5b55b39559e2230c8b728329892f35ac84649aab5408a988d1e",
+      "force_N": [
+        -0.0031039198462665366,
+        1.0853323174645834e-06,
+        1.0853323174594044e-06
+      ],
+      "moment_center_Nm": [
+        -5.66618719598824e-23,
+        -1.107806174480129e-09,
+        1.1078061745043446e-09
+      ],
+      "moment_side_Nm": [
+        -2.1706646349102047e-09,
+        -1.107806174480129e-09,
+        -6.206731886358592e-06
+      ],
+      "stationary_scalar_coenergy_J": -0.0021839855892365175,
+      "relative_free_dof_residual": 8.560953520909963e-13,
+      "change_from_level": 2,
+      "relative_change_axial_force": 0.007946781830390989,
+      "relative_change_force_vector": 0.008393598306988452,
+      "relative_change_side_moment_vector": 0.009768930499099346,
+      "absolute_change_center_moment_Nm": 1.327123771604653e-08
+    },
+    {
+      "gap_mm": 4.0,
+      "level": 4,
+      "tetrahedra": 294912,
+      "dofs": 409825,
+      "mesh_sha256": "df05acf5c7cefedec83e2cda2084c9ab44c1f690119c666d9b0bb230b592e156",
+      "model_sha256": "aea2dab31eb1c25a3137b906e10efe1aeffbf1dae1ae87d4bfb1727a4259b22e",
+      "solver_script_sha256": "f8f6c2bc3a1ada5c7acfb5dd7f42ba886c34004e72b2b87d7558d0c00930656b",
+      "virtual_work_sha256": "5b7e6022f35cf5b55b39559e2230c8b728329892f35ac84649aab5408a988d1e",
+      "force_N": [
+        -0.003090533136801154,
+        1.0290635506330507e-07,
+        1.0290635505803041e-07
+      ],
+      "moment_center_Nm": [
+        -1.6591175136282353e-21,
+        -1.884901904072543e-09,
+        1.8849019040529254e-09
+      ],
+      "moment_side_Nm": [
+        -2.0581271010934098e-10,
+        -1.884901904072543e-09,
+        -6.179181371698218e-06
+      ],
+      "stationary_scalar_coenergy_J": -0.0021906292989891107,
+      "relative_free_dof_residual": 1.621550506884751e-12,
+      "change_from_level": 3,
+      "relative_change_axial_force": 0.004331521091289239,
+      "relative_change_force_vector": 0.00435478740122436,
+      "relative_change_side_moment_vector": 0.0044716957111688,
+      "absolute_change_center_moment_Nm": 1.0989793200208124e-09
+    },
+    {
+      "gap_mm": 6.0,
+      "level": 1,
+      "tetrahedra": 4608,
+      "dofs": 7225,
+      "mesh_sha256": "16ea94f4310de000ff6d9e2a3891f1f0bc0c6b83b295d6894bd51d636ec169af",
+      "model_sha256": "0539cb0f5631f329dc696d24303b48c6d6f32ef79424c804050a4b7e67bcfc78",
+      "solver_script_sha256": "f8f6c2bc3a1ada5c7acfb5dd7f42ba886c34004e72b2b87d7558d0c00930656b",
+      "virtual_work_sha256": "5b7e6022f35cf5b55b39559e2230c8b728329892f35ac84649aab5408a988d1e",
+      "force_N": [
+        -0.0006054325344522281,
+        4.322127493819139e-06,
+        4.3221274938188185e-06
+      ],
+      "moment_center_Nm": [
+        -2.3119698120857124e-22,
+        -9.385834993256919e-09,
+        9.385834993255316e-09
+      ],
+      "moment_side_Nm": [
+        -8.6442549876379e-09,
+        -9.385834993256919e-09,
+        -1.2014792339112012e-06
+      ],
+      "stationary_scalar_coenergy_J": -0.002066895506865449,
+      "relative_free_dof_residual": 9.372533465212154e-13
+    },
+    {
+      "gap_mm": 6.0,
+      "level": 2,
+      "tetrahedra": 36864,
+      "dofs": 53361,
+      "mesh_sha256": "0d9c8db85675a17264dc7243b01d36d678c8e05e97bf98eaeb2dbe35dda529c9",
+      "model_sha256": "9960d94fdb201d4f34c8cd7598d99ec9261b08cbd6ca048640f062c1a3cec657",
+      "solver_script_sha256": "f8f6c2bc3a1ada5c7acfb5dd7f42ba886c34004e72b2b87d7558d0c00930656b",
+      "virtual_work_sha256": "5b7e6022f35cf5b55b39559e2230c8b728329892f35ac84649aab5408a988d1e",
+      "force_N": [
+        -0.0005774657436960353,
+        1.564292639420172e-07,
+        1.5642926394312844e-07
+      ],
+      "moment_center_Nm": [
+        1.7717174745120162e-22,
+        -3.2808199933901505e-09,
+        3.280819993394212e-09
+      ],
+      "moment_side_Nm": [
+        -3.128585278843623e-10,
+        -3.2808199933901505e-09,
+        -1.1516506673986696e-06
+      ],
+      "stationary_scalar_coenergy_J": -0.002164129681700698,
+      "relative_free_dof_residual": 7.365687316637868e-13,
+      "change_from_level": 1,
+      "relative_change_axial_force": 0.04843021609765625,
+      "relative_change_force_vector": 0.049493050883969464,
+      "relative_change_side_moment_vector": 0.044186666257319596,
+      "absolute_change_center_moment_Nm": 8.633795011298757e-09
+    },
+    {
+      "gap_mm": 6.0,
+      "level": 3,
+      "tetrahedra": 124416,
+      "dofs": 175273,
+      "mesh_sha256": "45475b678edfa328e024beb743f09f93970446139999a008d10fb95d15175783",
+      "model_sha256": "ff9a225bca2daee669f7c1f5a204cd63ee57f97ff02b1191702eab800fb862ff",
+      "solver_script_sha256": "f8f6c2bc3a1ada5c7acfb5dd7f42ba886c34004e72b2b87d7558d0c00930656b",
+      "virtual_work_sha256": "5b7e6022f35cf5b55b39559e2230c8b728329892f35ac84649aab5408a988d1e",
+      "force_N": [
+        -0.0005693892543558706,
+        -5.790615832176376e-08,
+        -5.790615832310093e-08
+      ],
+      "moment_center_Nm": [
+        4.54380650233035e-22,
+        -1.616679324748498e-09,
+        1.6166793247442678e-09
+      ],
+      "moment_side_Nm": [
+        1.1581231664960629e-10,
+        -1.616679324748498e-09,
+        -1.1371618293870034e-06
+      ],
+      "stationary_scalar_coenergy_J": -0.002182915505179334,
+      "relative_free_dof_residual": 8.990783478977772e-13,
+      "change_from_level": 2,
+      "relative_change_axial_force": 0.014184477979482357,
+      "relative_change_force_vector": 0.014194464099364654,
+      "relative_change_side_moment_vector": 0.01283051996814377,
+      "absolute_change_center_moment_Nm": 2.3534503032955186e-09
+    },
+    {
+      "gap_mm": 6.0,
+      "level": 4,
+      "tetrahedra": 294912,
+      "dofs": 409825,
+      "mesh_sha256": "df05acf5c7cefedec83e2cda2084c9ab44c1f690119c666d9b0bb230b592e156",
+      "model_sha256": "b13b0f9e8b5a8f6868feb3e980aae4726840e3ec22acec0c53a334aae8be895a",
+      "solver_script_sha256": "f8f6c2bc3a1ada5c7acfb5dd7f42ba886c34004e72b2b87d7558d0c00930656b",
+      "virtual_work_sha256": "5b7e6022f35cf5b55b39559e2230c8b728329892f35ac84649aab5408a988d1e",
+      "force_N": [
+        -0.0005658716873023704,
+        -6.856752752263747e-08,
+        -6.856752752460395e-08
+      ],
+      "moment_center_Nm": [
+        -2.1349660856964356e-22,
+        -9.678600812733335e-10,
+        9.67860081273169e-10
+      ],
+      "moment_side_Nm": [
+        1.3713505504817458e-10,
+        -9.678600812733335e-10,
+        -1.1307755145234697e-06
+      ],
+      "stationary_scalar_coenergy_J": -0.0021895446509046903,
+      "relative_free_dof_residual": 1.0745378659729963e-12,
+      "change_from_level": 3,
+      "relative_change_axial_force": 0.006216191996226461,
+      "relative_change_force_vector": 0.006216249008573663,
+      "relative_change_side_moment_vector": 0.005676831221210131,
+      "absolute_change_center_moment_Nm": 9.17568973648354e-10
+    },
+    {
+      "gap_mm": 8.0,
+      "level": 1,
+      "tetrahedra": 4608,
+      "dofs": 7225,
+      "mesh_sha256": "16ea94f4310de000ff6d9e2a3891f1f0bc0c6b83b295d6894bd51d636ec169af",
+      "model_sha256": "1ae41775e9d26be2b53c1483f93ad9f00aa3af8b8b9ece699684bc1b9b9c9120",
+      "solver_script_sha256": "f8f6c2bc3a1ada5c7acfb5dd7f42ba886c34004e72b2b87d7558d0c00930656b",
+      "virtual_work_sha256": "5b7e6022f35cf5b55b39559e2230c8b728329892f35ac84649aab5408a988d1e",
+      "force_N": [
+        -0.00015765231099285204,
+        3.962912064771666e-07,
+        3.962912064772908e-07
+      ],
+      "moment_center_Nm": [
+        1.8611563782443123e-24,
+        -5.294257854416768e-09,
+        5.294257854416739e-09
+      ],
+      "moment_side_Nm": [
+        -7.925824129543733e-10,
+        -5.294257854416768e-09,
+        -3.100103641312869e-07
+      ],
+      "stationary_scalar_coenergy_J": -0.0020540417774683475,
+      "relative_free_dof_residual": 9.869733411945882e-13
+    },
+    {
+      "gap_mm": 8.0,
+      "level": 2,
+      "tetrahedra": 36864,
+      "dofs": 53361,
+      "mesh_sha256": "0d9c8db85675a17264dc7243b01d36d678c8e05e97bf98eaeb2dbe35dda529c9",
+      "model_sha256": "a440571b98510ea4c165016115961ed73ca52363c19a98a30e40a89360034ba1",
+      "solver_script_sha256": "f8f6c2bc3a1ada5c7acfb5dd7f42ba886c34004e72b2b87d7558d0c00930656b",
+      "virtual_work_sha256": "5b7e6022f35cf5b55b39559e2230c8b728329892f35ac84649aab5408a988d1e",
+      "force_N": [
+        -0.00014834099614382452,
+        -2.5699290372221198e-08,
+        -2.5699290371203332e-08
+      ],
+      "moment_center_Nm": [
+        3.105804706195196e-22,
+        -1.2912642231187639e-09,
+        1.2912642231228117e-09
+      ],
+      "moment_side_Nm": [
+        5.139858074219978e-11,
+        -1.2912642231187639e-09,
+        -2.9539072806452575e-07
+      ],
+      "stationary_scalar_coenergy_J": -0.0021512467581572005,
+      "relative_free_dof_residual": 1.1253144782832726e-12,
+      "change_from_level": 1,
+      "relative_change_axial_force": 0.06276966645147572,
+      "relative_change_force_vector": 0.06289845624750276,
+      "relative_change_side_moment_vector": 0.05139326452285521,
+      "absolute_change_center_moment_Nm": 5.661087883471879e-09
+    },
+    {
+      "gap_mm": 8.0,
+      "level": 3,
+      "tetrahedra": 124416,
+      "dofs": 175273,
+      "mesh_sha256": "45475b678edfa328e024beb743f09f93970446139999a008d10fb95d15175783",
+      "model_sha256": "614db49f64282a03d5bc0d06c8d78d23ca847a8cee5c4ca59d8f3102bf840f5b",
+      "solver_script_sha256": "f8f6c2bc3a1ada5c7acfb5dd7f42ba886c34004e72b2b87d7558d0c00930656b",
+      "virtual_work_sha256": "5b7e6022f35cf5b55b39559e2230c8b728329892f35ac84649aab5408a988d1e",
+      "force_N": [
+        -0.00014590539922004514,
+        -2.9230364726081944e-08,
+        -2.9230364726458447e-08
+      ],
+      "moment_center_Nm": [
+        8.372618762685177e-23,
+        -5.707757974699852e-10,
+        5.70775797468705e-10
+      ],
+      "moment_side_Nm": [
+        5.846072945272291e-11,
+        -5.707757974699852e-10,
+        -2.9124002264262217e-07
+      ],
+      "stationary_scalar_coenergy_J": -0.002170027509798756,
+      "relative_free_dof_residual": 9.199664778060086e-13,
+      "change_from_level": 2,
+      "relative_change_axial_force": 0.016692986940847677,
+      "relative_change_force_vector": 0.01669302135708192,
+      "relative_change_side_moment_vector": 0.014464945541924516,
+      "absolute_change_center_moment_Nm": 1.0189245030891095e-09
+    },
+    {
+      "gap_mm": 8.0,
+      "level": 4,
+      "tetrahedra": 294912,
+      "dofs": 409825,
+      "mesh_sha256": "df05acf5c7cefedec83e2cda2084c9ab44c1f690119c666d9b0bb230b592e156",
+      "model_sha256": "583ce602015163da0004a696cd2259d1bced810eb28e53bed475489442ca80d4",
+      "solver_script_sha256": "f8f6c2bc3a1ada5c7acfb5dd7f42ba886c34004e72b2b87d7558d0c00930656b",
+      "virtual_work_sha256": "5b7e6022f35cf5b55b39559e2230c8b728329892f35ac84649aab5408a988d1e",
+      "force_N": [
+        -0.00014487430810433544,
+        -2.2235273566319897e-08,
+        -2.2235273565991248e-08
+      ],
+      "moment_center_Nm": [
+        -1.556618203505551e-23,
+        -3.274457382543653e-10,
+        3.2744573825280614e-10
+      ],
+      "moment_side_Nm": [
+        4.447054713268289e-11,
+        -3.274457382543653e-10,
+        -2.8942117047041893e-07
+      ],
+      "stationary_scalar_coenergy_J": -0.002176654607562745,
+      "relative_free_dof_residual": 1.0756941501011925e-12,
+      "change_from_level": 3,
+      "relative_change_axial_force": 0.007117142640413032,
+      "relative_change_force_vector": 0.007117470030853925,
+      "relative_change_side_moment_vector": 0.00634061680474151,
+      "absolute_change_center_moment_Nm": 3.4412066987597526e-10
+    }
+  ]
+}

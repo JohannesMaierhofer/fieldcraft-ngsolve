@@ -7,7 +7,7 @@ Install the Python bridge and put the FieldCraft CLI on the search path. Record 
 ```sh
 fieldcraft-ngsolve-transfer accepted-run/results.json flexure.fieldcraft loaded.fieldcraft \
   --manifest-sha256 "$ACCEPTED_MANIFEST_SHA256" \
-  --force force_armature --moment torque_about_side_point \
+  --force virtual_work_force_armature --moment virtual_work_torque_about_side_point \
   --region armature_pad --step Operating \
   --reference-point 0.003 0 0 --solve > transfer-receipt.json
 ```
@@ -25,8 +25,8 @@ FieldCraft creates a reference point, attaches it with a six-degree-of-freedom d
 ```sh
 python verify_transfer.py accepted-run/results.json \
   --manifest-sha256 "$ACCEPTED_MANIFEST_SHA256" \
-  --force force_armature --moment torque_about_side_point \
-  --moment-at-pad torque_about_armature_center \
+  --force virtual_work_force_armature --moment virtual_work_torque_about_side_point \
+  --moment-at-pad virtual_work_torque_about_armature_center \
   --cli /path/to/fieldcraft-cli --work check-new
 ```
 

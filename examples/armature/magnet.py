@@ -1,4 +1,5 @@
 """Current-free permanent-magnet/steel armature example for the external FieldCraft runner."""
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -7,6 +8,7 @@ import ngsolve as ng
 import numpy as np
 
 from fc_results import load_mesh, write_results
+from virtual_work import rigid_work
 from make_model import DOMAIN, ENVELOPE, FACES, MAGNET, STEEL, boundary_faces, contains
 
 # Idealized linear material data. The permeabilities and remanent flux specify this case.
@@ -76,12 +78,7 @@ def integrate_field(points, cells, B, steel, magnet, interface=None):
     return total, torque, torque_center, F_in, F_out
 
 
-def solve(source, output):
-    mesh, data = load_mesh(source)
-    xyz, cells = data["points_m"], data["tetrahedra"]
-    names = data["material_names"].astype(str)
-    labels = names[data["material_ids"] - 1]
-    steel, magnet = labels == "steel", labels == "magnet"
+def solve_potential(mesh):
     mu = mesh.MaterialCF({name: MU0*value for name,value in RELATIVE_MU.items()})
     br = mesh.MaterialCF({"magnet": REMANENCE}, default=0)
     if set(mesh.GetMaterials()) != set(RELATIVE_MU) or set(mesh.GetBoundaries()) != {"outer", "armature_air_envelope"}:
@@ -101,6 +98,16 @@ def solve(source, output):
     residual = ng.Norm(free*(a.mat*potential.vec-f.vec))/ng.Norm(free*f.vec)
     if not np.isfinite(residual) or residual > 1e-8:
         raise ValueError(f"Poor relative free-DOF residual {residual}")
+    return potential, mu, br, residual
+
+
+def solve(source, output):
+    mesh, data = load_mesh(source)
+    xyz, cells = data["points_m"], data["tetrahedra"]
+    names = data["material_names"].astype(str)
+    labels = names[data["material_ids"] - 1]
+    steel, magnet = labels == "steel", labels == "magnet"
+    potential, mu, br, residual = solve_potential(mesh)
     vtx = np.asarray(potential(mesh(*xyz.T))).reshape(-1)
     points = xyz[cells]
     delta = points[:,1:] - points[:,:1]
@@ -137,6 +144,10 @@ def solve(source, output):
     surface = data["interface_ids"] == group
     interface = tuple(data[key][surface] for key in ("interface_owner", "interface_neighbor", "interface_triangles"))
     F, tau, tau_c, F_in, F_out = integrate_field(xyz, cells, B, steel, magnet, interface)
+    force_vw, (torque_vw, center_vw) = rigid_work(xyz, cells, B, steel, magnet, MU0, (PIVOT, CENTER))
+    np.testing.assert_allclose(torque_vw, center_vw + np.cross(CENTER-PIVOT, force_vw), atol=1e-15)
+    grad_phi = ng.grad(potential)
+    stationary_coenergy = ng.Integrate(0.5 * mu * grad_phi * grad_phi - br * grad_phi[0], mesh)
     # Display only: averaging both sides at a material interface can smooth a physical jump.
     accum, weight = np.zeros_like(xyz), np.zeros(len(xyz))
     for local in range(4):
@@ -144,7 +155,11 @@ def solve(source, output):
         np.add.at(weight, cells[:,local], volume)
     B_display = accum / weight[:,None]
     write_results(output, data, {"scalar_potential": ("A", vtx), "B_nodal_average": ("T", B_display)},
-                  [{"name":"force_armature", "unit":"N", "value":F.tolist()},
+                  [{"name":"virtual_work_force_armature", "unit":"N", "value":force_vw.tolist()},
+                   {"name":"virtual_work_torque_about_side_point", "unit":"N m", "value":torque_vw.tolist()},
+                   {"name":"virtual_work_torque_about_armature_center", "unit":"N m", "value":center_vw.tolist()},
+                   {"name":"stationary_scalar_coenergy", "unit":"J", "value":float(stationary_coenergy)},
+                   {"name":"force_armature", "unit":"N", "value":F.tolist()},
                    {"name":"torque_about_side_point", "unit":"N m", "value":tau.tolist()},
                    {"name":"torque_about_armature_center", "unit":"N m", "value":tau_c.tolist()},
                    {"name":"force_inside_trace", "unit":"N", "value":F_in.tolist()},
@@ -153,13 +168,20 @@ def solve(source, output):
 
     manifest_path = Path(output)/"results.json"
     manifest = json.loads(manifest_path.read_text())
+    manifest["loads"] = [f"magnet remanence (+x, {REMANENCE:g} T)"]
     manifest["physics"] = {
+        "rigid_body_material": "steel", "coordinate_frame": "global Cartesian XYZ in SI",
+        "virtual_work_torque_about_side_point_origin_m": PIVOT.tolist(),
+        "virtual_work_torque_about_armature_center_origin_m": CENTER.tolist(),
+        "primary_force_method": "stationary magnetic coenergy derivative for rigid armature motion",
+        "virtual_work_sha256": hashlib.sha256(Path(__file__).with_name("virtual_work.py").read_bytes()).hexdigest(),
+        "surface_force_method": "supplementary Maxwell stress, averaged air-side FE traces",
         "formulation": "current-free 3D magnetostatic scalar potential, H1/P2",
         "relative_permeabilities": RELATIVE_MU, "remanent_flux_T": [REMANENCE, 0, 0],
         "outer_boundary": "zero scalar potential", "gap_m": float(xyz[cells[steel],0].min() - xyz[cells[magnet],0].max()),
         "surface": "armature_air_envelope", "air_envelope_m": ENVELOPE.tolist(),
         "torque_about_side_point_origin_m": PIVOT.tolist(),
-        "torque_about_armature_center_origin_m": CENTER.tolist(), "degree": 2, "dofs": fes.ndof,
+        "torque_about_armature_center_origin_m": CENTER.tolist(), "degree": 2, "dofs": potential.space.ndof,
     }
     manifest_path.write_text(json.dumps(manifest, indent=2, allow_nan=False) + "\n")
 
