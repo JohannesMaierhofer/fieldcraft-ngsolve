@@ -1,6 +1,7 @@
 """Build input for the Windows network installer from pinned CI desktop binaries."""
 
 import argparse
+import base64
 import hashlib
 import json
 import mmap
@@ -112,13 +113,16 @@ def stage(args):
         shutil.copyfile(packaging / name, payload / name)
     for name in ("install.ps1", "INSTALL.txt"):
         shutil.copyfile(recipe / name, payload / name)
-    (payload / "runtime-lock.json").write_text(
-        json.dumps({key: lock[key] for key in ("windows", "bridge")}, indent=2) + "\n", encoding="ascii")
+    shutil.copyfile(packaging / "runtime-lock.json", payload / "runtime-lock.json")
     identity = {
         "desktop": CORE, "bridge": lock["bridge"]["url"].split("/")[-1], "arch": args.arch,
+        "runtime_lock_sha256": digest(payload / "runtime-lock.json"),
         "files": {name: original[name] for name in ("fieldcraft.exe", "fieldcraft-cli.exe")},
     }
-    (payload / "identity.json").write_text(json.dumps(identity, indent=2) + "\n", encoding="ascii")
+    canonical = json.dumps(identity, sort_keys=True, separators=(",", ":")).encode("ascii")
+    fingerprint = hashlib.sha256(canonical).digest()
+    identity["generation"] = base64.b32encode(fingerprint).decode("ascii").rstrip("=").lower()
+    (payload / "identity.json").write_bytes((json.dumps(identity, indent=2) + "\n").encode("ascii"))
 
 
 def main():

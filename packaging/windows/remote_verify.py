@@ -85,7 +85,7 @@ def main():
     try:
         sftp(args.host, [f"get {sftp_quote(path + '/test/verification.json')} {sftp_quote(temp.absolute())}"])
         proof = json.loads(temp.read_text(encoding="utf-8-sig"))
-        if proof["archive_sha256"] != expected or proof["install_count"] != 2 or proof["field_imports"] != 2:
+        if proof["archive_sha256"] != expected or proof["install_count"] != 3 or proof["field_imports"] != 2 or not proof["damaged_case_repaired"]:
             raise ValueError("Incomplete report from remote verification")
         with args.proof.open("xb") as output:
             output.write(json.dumps(proof, indent=2).encode("utf-8") + b"\n")
