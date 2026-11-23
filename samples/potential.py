@@ -12,7 +12,8 @@ def solve(source, destination):
     u, v = fes.TnT()
     stiffness = ng.BilinearForm(ng.grad(u)*ng.grad(v)*ng.dx).Assemble()
     phi = ng.GridFunction(fes)
-    phi.Set(mesh.BoundaryCF({"left": 1, "right": 0}), definedon=mesh.Boundaries("left|right"))
+    electrodes = {"left": 1, "right": 0}
+    phi.Set(mesh.BoundaryCF(electrodes), definedon=mesh.Boundaries("left|right"))
     residual = phi.vec.CreateVector()
     residual.data = -stiffness.mat*phi.vec
     phi.vec.data += stiffness.mat.Inverse(fes.FreeDofs(), inverse="sparsecholesky")*residual
@@ -21,7 +22,8 @@ def solve(source, destination):
     energy = ng.Integrate(0.5*eps*(electric*electric), mesh)
     nodes = mesh(*data["points_m"].T)
     fields = {"potential": ("V", phi(nodes).ravel()), "electric_field": ("V/m", electric(nodes).reshape(-1,3))}
-    write_results(destination, data, fields, [{"name": "stored_energy", "unit": "J", "value": energy}])
+    write_results(destination, data, fields, [{"name": "stored_energy", "unit": "J", "value": energy}],
+                  loads=[f"{face} electrode ({voltage} V)" for face, voltage in electrodes.items()])
 
 
 if __name__ == "__main__":

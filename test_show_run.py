@@ -34,6 +34,41 @@ class ViewerTests(unittest.TestCase):
         self.assertEqual(requests[2],('engine.execute',{'command':'results.external.contour','params':{'path':str(self.root/'field-1.json'),'component':'z'}}))
         self.assertEqual(requests[3],('engine.execute',{'command':'results.external.integrals','params':{'path':str(self.manifest)}}))
 
+    def test_field_only_registers_catalog_and_keeps_original_reply(self):
+        self.run['integrals'] = []
+        for metadata in ({'schema':{'properties':{'catalog_only':{'type':'boolean'}}}},
+                         {'params':'path, catalog_only?'}):
+            with self.subTest(metadata=metadata):
+                commands = [self.commands[0], dict(self.commands[1], **metadata)]
+                rpc = Mock(side_effect=[commands, {}, {'registered':True}, {'shown':True}])
+                replies = apply(rpc, self.manifest, self.run, 'B', None, False, None)
+                self.assertEqual(replies, [{'shown':True}])
+                calls = [entry.args[1] for entry in rpc.call_args_list[2:]]
+                self.assertEqual(calls[0], {'command':'results.external.integrals',
+                                            'params':{'path':str(self.manifest), 'catalog_only':True}})
+                self.assertEqual(calls[1]['command'], 'results.external.contour')
+
+    def test_regular_integrals_register_once(self):
+        rpc = Mock(side_effect=[[dict(self.commands[1], params='path, catalog_only?')], {}, {'integrals':[]}])
+        result = apply(rpc, self.manifest, self.run, None, None, True, None, catalog=True)
+        self.assertEqual(result, [{'integrals':[]}])
+        self.assertEqual(rpc.call_args.args[1]['params'], {'path':str(self.manifest)})
+
+    def test_explicit_catalog_without_a_display_selection(self):
+        rpc = Mock(side_effect=[[dict(self.commands[1], params='path, catalog_only?')], {}, {'registered':True}])
+        self.assertEqual(apply(rpc,self.manifest,self.run,None,None,False,None,catalog=True), [])
+        older = Mock(return_value=self.commands)
+        with self.assertRaisesRegex(ControlError, 'Ergebniskatalog'):
+            apply(older,self.manifest,self.run,None,None,False,None,catalog=True)
+        self.assertEqual(older.call_count,1)
+
+    def test_wrong_catalog_mesh_never_changes_the_contour(self):
+        rpc = Mock(side_effect=[[self.commands[0], dict(self.commands[1], params='path,catalog_only')], {},
+                                ControlError('different mesh')])
+        with self.assertRaisesRegex(ControlError, 'different mesh'):
+            apply(rpc,self.manifest,self.run,'B',None,False,None)
+        self.assertEqual(rpc.call_args.args[1]['command'],'results.external.integrals')
+
     def test_wrong_mesh_stops_without_changing_document(self):
         rpc = Mock(side_effect=[self.commands, {}, ControlError('different mesh')])
         with self.assertRaisesRegex(ControlError,'different mesh'):

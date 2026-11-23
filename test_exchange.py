@@ -48,6 +48,42 @@ class ExchangeTests(unittest.TestCase):
                 f.writestr(name, data)
         export_mesh(self.native, self.npz, ["a", "b"], ["volume"])
 
+    def test_optional_loads_preserve_previous_manifests_and_validate_labels(self):
+        from fc_results import validate_loads, write_results
+        with np.load(self.npz,allow_pickle=False) as data:
+            output=self.root / "solver"
+            fields={"u":("V",np.zeros(len(data["node_ids"])))}
+            write_results(output,data,fields,[])
+            manifest=output/"results.json"
+            self.assertNotIn("loads", json.loads(manifest.read_text()))
+            write_results(output,data,fields,[],loads=["left electrode (1 V)","right electrode (0 V)"])
+            self.assertEqual(json.loads(manifest.read_text())["loads"],
+                             ["left electrode (1 V)","right electrode (0 V)"])
+        validate_loads([])
+        validate_loads(["ü"*60])
+        validate_loads([str(i) for i in range(4096)])
+        for invalid in (None, "left", ["left","left"], [""], [" "], [True], ["a\nb"], ["ü"*61],
+                        [str(i) for i in range(4097)]):
+            with self.subTest(invalid=type(invalid)), self.assertRaises(ValueError):
+                validate_loads(invalid)
+
+    def test_workflow_rejects_malformed_loads_from_a_plain_python_script(self):
+        from argparse import Namespace
+        import sys
+        from workflow import run
+        script=self.root / "malformed.py"
+        script.write_text("import json,sys,numpy as np\nfrom pathlib import Path\n"
+                          "with np.load(sys.argv[1]) as data: digest=str(data['mesh_sha256'].item())\n"
+                          "record={'mesh_sha256':digest,'fields':[],'integrals':[], 'loads':['a','a']}\n"
+                          "(Path(sys.argv[2])/'results.json').write_text(json.dumps(record))\n")
+        output=self.root/"bad-run"
+        args=Namespace(model=self.native,script=script,python=sys.executable,dimension=3,
+                       boundaries=["a","b"],materials=["volume"],interfaces=[],
+                       adapter=Path(__file__).parent,out=output,timeout=30)
+        with self.assertRaisesRegex(ValueError,"duplicate load"):
+            run(args)
+        self.assertFalse(output.exists())
+
     def write_vtu(self, labels=None):
         # Original IDs are retained although the solver's vertex rows have been reordered.
         permutation = np.array([2, 0, 3, 1])

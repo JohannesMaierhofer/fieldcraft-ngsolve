@@ -53,3 +53,16 @@ write_results(output, data, fields, integrals, series={"B": ("T", snapshots)})
 ```
 
 The new run's optional `series` list names a `fieldcraft-nodal-series/1` JSON file. Each entry of its `frames` array gives a strictly increasing finite `time` and a sibling `file`. Each of the 2–4096 files is an ordinary `fieldcraft-nodal-field/1` bound to the same native mesh digest, labels, field name, unit and component count. The workflow checks the files before publishing the run. A case can select a default `series` and vector `component`. The generated `view-series-N.json` recipe and `show_run.py --series NAME` use the native `results.external.series` command. [Transient magnetic diffusion example](examples/magnetic-diffusion/README.md)
+
+## Browse the external run in FieldCraft
+
+A solver script can name the excitations it actually applied. For the capacitor these are the two prescribed electrode potentials.
+
+```python
+write_results(output, data, fields, integrals,
+              loads=["left electrode (1 V)", "right electrode (0 V)"])
+```
+
+The optional `loads` list in `results.json` preserves the given order. Use up to 4096 distinct printable names, each at most 120 UTF-8 bytes long. Omit it when the script has no excitation to report. The runner records the selected materials, boundary sets and interfaces from the mesh exchange. `python show_run.py run-01 --list` lists these names alongside the fields, time series, integrals and loads.
+
+On a desktop with external catalogue support, use **File → Run** with `run-01/view-run.json` to open the matching model and register its whole run in the model browser. In a window that already has this mesh open, run `python show_run.py run-01 --port PORT --catalog`. Selecting a field or series through the launcher also registers the catalogue, including for a field-only run with an empty integral list. The control connection checks the command capabilities advertised by that desktop. Existing individual `view-N.json` and `view-series-N.json` recipes continue to work on desktops supporting their respective display commands.

@@ -118,6 +118,9 @@ def run(args):
         fields, integrals = manifest["fields"], manifest["integrals"]
         if manifest.get("mesh_sha256") != mesh_hash:
             raise ValueError("Missing or incorrect output mesh fingerprint")
+        if "loads" in manifest:
+            from fc_results import validate_loads
+            validate_loads(manifest["loads"])
         series = manifest.get("series", [])
         if not all(isinstance(items,list) for items in (fields,integrals,series)) or not (fields or integrals or series):
             raise ValueError("Expected a field, integral or time series")
@@ -157,6 +160,10 @@ def run(args):
                         model_sha256=model_hash, exchange_sha256=exchange_hash, runtime=runtime, platform=platform.platform(), materials=args.materials,
                         boundaries=args.boundaries, dimension=args.dimension, interfaces=args.interfaces)
         dump(stage/"results.json",manifest)
+        dump(stage/"view-run.json", [
+            {"command":"file.open", "params":{"path":str(model)}},
+            {"command":"results.external.integrals", "params":{"path":str(dest/"results.json"), "catalog_only":True}},
+        ])
         if dest.exists():
             raise FileExistsError(dest)
         stage.rename(dest)

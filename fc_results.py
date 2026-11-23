@@ -57,8 +57,24 @@ def load_mesh(path):
     return mesh, data
 
 
-def write_results(output, data, fields, integrals, *, series=None):
-    """Write original topology and labelled real fields. Scalars and vectors carry SI units."""
+def validate_loads(loads):
+    """Check the optional list of physical excitation names in an external run."""
+    if not isinstance(loads, list):
+        raise ValueError("loads must be a list of distinct, nonempty strings")
+    if len(loads) > 4096:
+        raise ValueError("loads exceeds the catalogue limit of 4096 entries")
+    seen = set()
+    for name in loads:
+        if (not isinstance(name, str) or not name.strip() or not name.isprintable()
+                or len(name.encode("utf-8")) > 120 or name in seen):
+            raise ValueError(f"Invalid or duplicate load name: {name!r}")
+        seen.add(name)
+
+
+def write_results(output, data, fields, integrals, *, series=None, loads=None):
+    """Write SI fields and integrals, optionally naming excitations applied by the solver."""
+    if loads is not None:
+        validate_loads(loads)
     out = Path(output)
     out.mkdir(parents=True, exist_ok=True)
     points = data["points_m"]
@@ -93,6 +109,8 @@ def write_results(output, data, fields, integrals, *, series=None):
     add(cell_data, "types", "UInt8", np.full(len(cells), 10 if is_volume else 5))
     ET.ElementTree(root).write(out/"fields.vtu", encoding="utf-8", xml_declaration=True)
     manifest = {"fields": catalog, "integrals": integrals, "mesh_sha256": str(data["mesh_sha256"].item())}
+    if loads is not None:
+        manifest["loads"] = loads
     if series:
         from time_series import write
         manifest["series"] = write(out, data, series)

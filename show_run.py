@@ -120,7 +120,7 @@ def open_model(call, model):
     raise ControlError('Das Fenster hat das Öffnen des Modells nicht innerhalb von 120 Sekunden bestätigt.')
 
 
-def apply(call, manifest, run, field, component, integrals, model, series=None):
+def apply(call, manifest, run, field, component, integrals, model, series=None, *, catalog=False):
     actions = []
     if field:
         actions.append(('results.external.contour', select_field(manifest, run, field, component)))
@@ -135,9 +135,14 @@ def apply(call, manifest, run, field, component, integrals, model, series=None):
         actions.append(('results.external.series', {'path':str(path), **({'component': component} if component else {})}))
     if integrals:
         actions.append(('results.external.integrals', {'path': str(manifest)}))
-    if not actions:
-        raise ValueError('Ein Feld oder --integrals auswählen.')
-    available = {entry['id'] for entry in call('engine.commands', {})}
+    if not actions and not catalog:
+        raise ValueError('Ein Feld, eine Zeitreihe, --integrals oder --catalog auswählen.')
+    available = {entry['id']:entry for entry in call('engine.commands', {})}
+    spec = available.get('results.external.integrals', {})
+    supports_catalog = ('catalog_only' in spec.get('schema', {}).get('properties', {})
+                        or re.search(r'\bcatalog_only\b', spec.get('params', '')) is not None)
+    if catalog and not supports_catalog:
+        raise ControlError('Dieser FieldCraft-Build unterstützt den Ergebniskatalog noch nicht.')
     missing = [cmd for cmd, _ in actions if cmd not in available]
     if missing:
         raise ControlError('Dieser FieldCraft-Build unterstützt die ausgewählten Befehle noch nicht: ' + ', '.join(missing))
@@ -149,6 +154,11 @@ def apply(call, manifest, run, field, component, integrals, model, series=None):
         idle(state)
         if state.get('busy') or state.get('job'):
             raise ControlError('Im ausgewählten Fenster läuft eine Aufgabe.')
+    # Request the catalogue before changing the displayed field. An explicit
+    # integral display registers the same manifest in its regular command.
+    if supports_catalog and not integrals:
+        call('engine.execute', {'command':'results.external.integrals',
+                                'params':{'path':str(manifest), 'catalog_only':True}})
     results = []
     for command, params in actions:
         # Each native command re-encodes the CURRENT in-memory mesh and checks the
@@ -167,6 +177,7 @@ def main(argv=None):
     display.add_argument('--field', help='Exakter Feldname aus --list')
     parser.add_argument('--component', choices=('x','y','z','magnitude'), help='Vektorkomponente, Standard ist der Betrag')
     parser.add_argument('--integrals', action='store_true', help='Integrale im aktuellen Modell prüfen und anzeigen')
+    parser.add_argument('--catalog', action='store_true', help='Den vollständigen Ergebniskatalog im Modellbrowser registrieren')
     parser.add_argument('--open-model', action='store_true', help='Bei Bedarf das Modell aus dem Manifest über die normale Öffnen-Funktion laden')
     parser.add_argument('--model', type=Path, help='Mit --open-model einen verschobenen Modellpfad angeben')
     args = parser.parse_args(argv)
@@ -175,19 +186,22 @@ def main(argv=None):
         parser.error('--component benötigt --field oder --series.')
     if args.model and not args.open_model:
         parser.error('--model benötigt --open-model.')
-    if args.list or (not args.field and not args.integrals and not args.series):
-        print(json.dumps({'fields': [{k:f[k] for k in ('name','unit')} for f in run['fields']],
-                          'series': [{k:s[k] for k in ('name','unit')} for s in run.get('series',[])],
-                          'integrals': [{k:q[k] for k in ('name','unit')} for q in run['integrals']]},
-                         ensure_ascii=False, indent=2))
-    if not args.field and not args.integrals and not args.series:
+    display_requested = args.field or args.series or args.integrals or args.catalog
+    if args.list or not display_requested:
+        listing = {key:[{k:item[k] for k in ('name','unit')} for item in run.get(key, [])]
+                   for key in ('fields','series','integrals')}
+        listing.update({key:run.get(key, []) for key in ('materials','boundaries','interfaces','loads')})
+        print(json.dumps(listing, ensure_ascii=False, indent=2))
+    if not display_requested:
         if args.open_model:
-            parser.error('--open-model benötigt --field oder --integrals.')
+            parser.error('--open-model benötigt --field, --series, --integrals oder --catalog.')
         return
     if args.port is None:
         parser.error('Für die Anzeige im Fenster --port angeben.')
     model = (args.model or Path(run['model'])).resolve(strict=True) if args.open_model else None
-    replies = apply(Control(args.port), manifest, run, args.field, args.component, args.integrals, model, series=args.series)
+    replies = apply(Control(args.port), manifest, run, args.field, args.component, args.integrals, model, series=args.series, catalog=args.catalog)
+    if args.catalog and not replies:
+        print(f'Ergebniskatalog registriert: {manifest}')
     for reply in replies:
         print(json.dumps(reply, ensure_ascii=False, indent=2))
 
